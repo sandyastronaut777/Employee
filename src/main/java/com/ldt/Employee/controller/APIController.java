@@ -1,17 +1,16 @@
 package com.ldt.Employee.controller;
 
 import com.ldt.Employee.dto.RequestDTO;
+import com.ldt.Employee.entity.Employee;
 import com.ldt.Employee.service.EmployeeService;
 import com.ldt.Employee.utility.APIResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 public class APIController {
@@ -44,14 +43,15 @@ public class APIController {
         return employeeService.export();
     }
 
-    @RequestMapping(value = "/download/file/{fileName:.+}", method = RequestMethod.GET)
-    APIResponse download(HttpServletRequest request, HttpServletResponse response, @PathVariable("fileName") String fileName) throws IOException {
-        return employeeService.download(request, response, fileName);
-    }
-
     @RequestMapping(value = "/downloadTemplate", method = RequestMethod.GET)
     ResponseEntity<ByteArrayResource> downloadTemplate() throws Exception {
         return employeeService.downloadTemplate();
     }
+
+    @RequestMapping(value = "/filterbydate", method = RequestMethod.GET)
+    List<Employee> getAllBetweenDates(@RequestParam("startDate")String startDate, @RequestParam("endDate")String endDate){
+        return employeeService.getAllBetweenDates(LocalDate.parse(startDate), (LocalDate.parse(endDate)));
+    }
+
 }
 

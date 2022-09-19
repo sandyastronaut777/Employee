@@ -16,17 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLConnection;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -46,6 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setEmpName(requestDTO.getEmpName());
         employee.setProjectName(requestDTO.getProjectName());
         employee.setSalary(requestDTO.getSalary());
+        employee.setDate(requestDTO.getDate());
         return employee;
     }
 
@@ -61,6 +56,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setEmpName(requestDTO.getEmpName());
         employee.setProjectName(requestDTO.getProjectName());
         employee.setSalary(requestDTO.getSalary());
+        employee.setDate(requestDTO.getDate());
         employeeRepository.save(employee);
         return new APIResponse("Success", "Successfully Updated", 200, null);
     }
@@ -70,6 +66,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         responseDTO.setEmpName(employee.getEmpName());
         responseDTO.setProjectName(employee.getProjectName());
         responseDTO.setSalary(employee.getSalary());
+        responseDTO.setDate(employee.getDate());
         return responseDTO;
     }
 
@@ -82,7 +79,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new APIResponse("Success", "Successfully Deleted", 200, null);
     }
 
-
     @Override
     public APIResponse export() throws IOException {
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
@@ -93,6 +89,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         xssfRow.createCell(1).setCellValue("emp_name");
         xssfRow.createCell(2).setCellValue("project_name");
         xssfRow.createCell(3).setCellValue("salary");
+        xssfRow.createCell(4).setCellValue("date");
 
         List<Employee> all = employeeRepository.findAll();
         System.out.println(all.size());
@@ -105,6 +102,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     row.createCell(1).setCellValue(i.getEmpName());
                     row.createCell(2).setCellValue(i.getProjectName());
                     row.createCell(3).setCellValue(i.getSalary());
+                    row.createCell(4).setCellValue(i.getDate());
 
                 }
         );
@@ -115,39 +113,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         System.out.println("Done Exporting");
         return new APIResponse("Success", "Successfully Exported", 200, null);
     }
-
-
-//    @Override
-//    public APIResponse download(HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException {
-//
-//        final String EXTERNAL_FILE_PATH = "/Users/ldttechnology/Downloads/Employee/exporteddata/";
-//        File file = new File(EXTERNAL_FILE_PATH + fileName);
-//        if (file.exists()) {
-//            System.out.println("File exsist.");
-//            //get the mimetype
-//            String name = file.getName();
-//            System.out.println(name);
-//
-//            String mimeType = URLConnection.guessContentTypeFromName(file.getName());
-//            if (mimeType == null) {
-//                //unknown mimetype so set the mimetype to application/octet-stream
-//                mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-//            }
-//
-//            response.setContentType(mimeType);
-//
-//            response.setHeader("Content-Disposition", String.format("inline; filename=/" + file.getName() + "/"));
-//
-//            response.setContentLength((int) file.length());
-//
-//            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-//
-//            FileCopyUtils.copy(inputStream, response.getOutputStream());
-//
-//        }
-//        return new APIResponse("Success", "Successfully Downloaded", 200, null);
-//
-//    }
 
     @Override
     public ResponseEntity<ByteArrayResource> downloadTemplate() {
@@ -198,5 +163,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         return xssfWorkbook;
 
     }
+
+    @Override
+    public List<Employee> getAllBetweenDates(LocalDate startDate, LocalDate endDate) {
+        startDate = LocalDate.of(2022, 03,21);
+
+        endDate = LocalDate.of(2022, 11,26);
+
+        List<Employee> employee = employeeRepository.findByDateBetween(startDate, endDate);
+        employee.forEach((p)-> {
+            System.out.println(p.getId());
+            System.out.println(p.getEmpName());
+            System.out.println(p.getProjectName());
+            System.out.println(p.getSalary());
+        });
+        return employee;
+    }
+
 }
 
