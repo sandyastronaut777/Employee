@@ -6,7 +6,10 @@ import com.ldt.Employee.utility.APIResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
 
 @RestController
 public class APIController {
@@ -20,7 +23,7 @@ public class APIController {
     }
 
     @RequestMapping(value = "/update/{id}", method = RequestMethod.POST)
-    APIResponse update(@RequestBody RequestDTO requestDTO, int id){
+    APIResponse update(@RequestBody RequestDTO requestDTO, int id) {
         return employeeService.update(requestDTO, id);
     }
 
@@ -34,11 +37,14 @@ public class APIController {
         return employeeService.delete(id);
     }
 
-    @RequestMapping(value = "/export", method = RequestMethod.GET)
-    APIResponse exportToExcel(HttpServletResponse response){
-        return null;
+    @RequestMapping(value = "/export", method = RequestMethod.POST)
+    APIResponse export() throws IOException {
+        return employeeService.export();
     }
 
+    @RequestMapping(value = "/download/file/{fileName:.+}", method = RequestMethod.GET)
+    APIResponse download(HttpServletRequest request, HttpServletResponse response, @PathVariable("fileName") String fileName) throws IOException {
+         return employeeService.download(request, response, fileName);
+        }
+    }
 
-
-}

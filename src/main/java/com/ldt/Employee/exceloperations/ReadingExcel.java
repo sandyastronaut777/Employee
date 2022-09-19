@@ -9,7 +9,7 @@ public class ReadingExcel {
     public static void main(String[] args) throws IOException {
         String path = ".//datafiles//Data Refresh Sample Data.xlsx";
         FileInputStream fileInputStream = new FileInputStream(path);
-        System.out.println("finle"+fileInputStream);
+        System.out.println("file"+fileInputStream);
 
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileInputStream);
         System.out.println(xssfWorkbook);
