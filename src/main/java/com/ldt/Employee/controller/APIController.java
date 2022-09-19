@@ -4,6 +4,8 @@ import com.ldt.Employee.dto.RequestDTO;
 import com.ldt.Employee.service.EmployeeService;
 import com.ldt.Employee.utility.APIResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +46,12 @@ public class APIController {
 
     @RequestMapping(value = "/download/file/{fileName:.+}", method = RequestMethod.GET)
     APIResponse download(HttpServletRequest request, HttpServletResponse response, @PathVariable("fileName") String fileName) throws IOException {
-         return employeeService.download(request, response, fileName);
-        }
+        return employeeService.download(request, response, fileName);
     }
+
+    @RequestMapping(value = "/downloadTemplate", method = RequestMethod.GET)
+    ResponseEntity<ByteArrayResource> downloadTemplate() throws Exception {
+        return employeeService.downloadTemplate();
+    }
+}
 

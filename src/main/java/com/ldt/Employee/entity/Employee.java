@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,4 +27,6 @@ public class Employee {
     private String projectName;
 
     private int salary;
+
+    private LocalDate createdAt;
 }

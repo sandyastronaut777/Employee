@@ -3,6 +3,9 @@ package com.ldt.Employee.service;
 
 import com.ldt.Employee.dto.RequestDTO;
 import com.ldt.Employee.utility.APIResponse;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,5 +29,8 @@ public interface EmployeeService {
     APIResponse export() throws IOException;
 
 
-    APIResponse download(HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException;
+//    APIResponse download(HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException;
+
+    ResponseEntity<ByteArrayResource> downloadTemplate();
+
 }

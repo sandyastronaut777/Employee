@@ -10,6 +10,11 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +25,8 @@ import java.io.*;
 import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -110,35 +117,85 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
 
+//    @Override
+//    public APIResponse download(HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException {
+//
+//        final String EXTERNAL_FILE_PATH = "/Users/ldttechnology/Downloads/Employee/exporteddata/";
+//        File file = new File(EXTERNAL_FILE_PATH + fileName);
+//        if (file.exists()) {
+//            System.out.println("File exsist.");
+//            //get the mimetype
+//            String name = file.getName();
+//            System.out.println(name);
+//
+//            String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+//            if (mimeType == null) {
+//                //unknown mimetype so set the mimetype to application/octet-stream
+//                mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+//            }
+//
+//            response.setContentType(mimeType);
+//
+//            response.setHeader("Content-Disposition", String.format("inline; filename=/" + file.getName() + "/"));
+//
+//            response.setContentLength((int) file.length());
+//
+//            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+//
+//            FileCopyUtils.copy(inputStream, response.getOutputStream());
+//
+//        }
+//        return new APIResponse("Success", "Successfully Downloaded", 200, null);
+//
+//    }
+
     @Override
-    public APIResponse download(HttpServletRequest request, HttpServletResponse response, String fileName) throws IOException {
-
-        final String EXTERNAL_FILE_PATH = "/Users/ldttechnology/Downloads/Employee/exporteddata/";
-        File file = new File(EXTERNAL_FILE_PATH + fileName);
-        if (file.exists()) {
-            System.out.println("File exsist.");
-            //get the mimetype
-            String name = file.getName();
-            System.out.println(name);
-
-            String mimeType = URLConnection.guessContentTypeFromName(file.getName());
-            if (mimeType == null) {
-                //unknown mimetype so set the mimetype to application/octet-stream
-                mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            }
-
-            response.setContentType(mimeType);
-
-            response.setHeader("Content-Disposition", String.format("inline; filename=/" + file.getName() + "/"));
-
-            response.setContentLength((int) file.length());
-
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-
-            FileCopyUtils.copy(inputStream, response.getOutputStream());
-
+    public ResponseEntity<ByteArrayResource> downloadTemplate() {
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            XSSFWorkbook workbook = createWorkBook(); // creates the workbook
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(new MediaType("application", "force-download"));
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ProductTemplate.xlsx");
+            workbook.write(stream);
+            workbook.close();
+            return new ResponseEntity<>(new ByteArrayResource(stream.toByteArray()),
+                    header, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new APIResponse("Success","Successfully Downloaded", 200, null);
+    }
+
+    private XSSFWorkbook createWorkBook() throws IOException {
+        XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
+        XSSFSheet xssfSheet = xssfWorkbook.createSheet("Employee Data");
+
+        XSSFRow xssfRow = xssfSheet.createRow(0);
+        xssfRow.createCell(0).setCellValue("id");
+        xssfRow.createCell(1).setCellValue("emp_name");
+        xssfRow.createCell(2).setCellValue("project_name");
+        xssfRow.createCell(3).setCellValue("salary");
+
+        List<Employee> all = employeeRepository.findAll();
+        System.out.println(all.size());
+
+        AtomicInteger count = new AtomicInteger(1);
+        all.forEach(i ->
+                {
+                    XSSFRow row = xssfSheet.createRow(count.getAndIncrement());
+                    row.createCell(0).setCellValue(i.getId());
+                    row.createCell(1).setCellValue(i.getEmpName());
+                    row.createCell(2).setCellValue(i.getProjectName());
+                    row.createCell(3).setCellValue(i.getSalary());
+
+                }
+        );
+
+        FileOutputStream fileOutputStream = new FileOutputStream(".//exporteddata//empNewDATA.xlsx");
+        xssfWorkbook.write(fileOutputStream);
+
+        System.out.println("Done Exporting");
+        return xssfWorkbook;
 
     }
 }
