@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -61,6 +62,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new APIResponse("Success", "Successfully Updated", 200, null);
     }
 
+
     private ResponseDTO getDataFromEntity(Employee employee) {
         ResponseDTO responseDTO = new ResponseDTO();
         responseDTO.setEmpName(employee.getEmpName());
@@ -69,6 +71,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         responseDTO.setDate(employee.getDate());
         return responseDTO;
     }
+//
+//    @Override
+//    public void getData() {
+//        System.out.println("Method Started");
+//        String empName = requestDTO.getEmpName();
+//        if (empName == null || empName == "" || Objects.isNull(empName)) {
+//
+//            empName = "0";
+//        }
+//        String projectName = requestDTO.getProjectName();
+//        if (projectName == null || projectName == "" || Objects.isNull(projectName)) {
+//
+//            projectName = "0";
+//        }
+//        int salary = employeeRepository.getSalary();
+//        if (Objects.isNull(salary)) {
+//
+//            salary = 0;
+//        }
+//        List<Employee> employee = employeeRepository.getData(empName, projectName, salary);
+////        List<ResponseDTO> responseDTO = new ArrayList<>();
+////        if(!employee.isEmpty()) {
+////            responseDTO = employee.stream().map(this::getDataFromEntity).collect(Collectors.toList());
+//
+//        }
+
 
     @Override
     public APIResponse delete(int id) {
@@ -107,7 +135,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
         );
 
-        FileOutputStream fileOutputStream = new FileOutputStream(".//exporteddata//employeeDATA.xlsx");
+        FileOutputStream fileOutputStream = new FileOutputStream("null");
         xssfWorkbook.write(fileOutputStream);
 
         System.out.println("Done Exporting");
@@ -166,19 +194,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<Employee> getAllBetweenDates(LocalDate startDate, LocalDate endDate) {
-        startDate = LocalDate.of(2022, 03,21);
-
-        endDate = LocalDate.of(2022, 11,26);
 
         List<Employee> employee = employeeRepository.findByDateBetween(startDate, endDate);
-        employee.forEach((p)-> {
-            System.out.println(p.getId());
-            System.out.println(p.getEmpName());
-            System.out.println(p.getProjectName());
-            System.out.println(p.getSalary());
-        });
         return employee;
     }
-
 }
 

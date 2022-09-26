@@ -6,8 +6,12 @@ import com.ldt.Employee.entity.Employee;
 import com.ldt.Employee.utility.APIResponse;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
+
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public interface EmployeeService {
@@ -25,5 +29,6 @@ public interface EmployeeService {
     ResponseEntity<ByteArrayResource> downloadTemplate();
 
     List<Employee> getAllBetweenDates(LocalDate startDate, LocalDate endDate);
+
 
 }
