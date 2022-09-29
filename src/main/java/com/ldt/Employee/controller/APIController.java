@@ -52,27 +52,22 @@ public class APIController {
         return employeeService.get(id);
     }
 
+
+
     @DeleteMapping("/delete/{id}")
     APIResponse delete(@PathVariable int id) {
         return employeeService.delete(id);
     }
 
-    @PostMapping("/export")
-    APIResponse export() throws IOException {
-        return employeeService.export();
-    }
-
-    @GetMapping("/downloadTemplate")
-    ResponseEntity<ByteArrayResource> downloadTemplate() throws Exception {
-        return employeeService.downloadTemplate();
+    @GetMapping("/downloadData")
+    ResponseEntity<ByteArrayResource> downloadData() throws Exception {
+        return employeeService.downloadData();
     }
 
     @GetMapping("/filterbydate")
-    List<Employee> getAllBetweenDates(@RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+    List<Employee> getAllBetweenDates(@RequestParam("startDate")String startDate, @RequestParam("endDate")String endDate){
         return employeeService.getAllBetweenDates(LocalDate.parse(startDate), (LocalDate.parse(endDate)));
     }
-
-
 }
 
 

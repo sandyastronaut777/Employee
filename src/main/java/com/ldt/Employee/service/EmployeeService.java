@@ -24,11 +24,8 @@ public interface EmployeeService {
 
     APIResponse delete(int id);
 
-    APIResponse export() throws IOException;
-
-    ResponseEntity<ByteArrayResource> downloadTemplate();
+    ResponseEntity<ByteArrayResource> downloadData();
 
     List<Employee> getAllBetweenDates(LocalDate startDate, LocalDate endDate);
-
 
 }

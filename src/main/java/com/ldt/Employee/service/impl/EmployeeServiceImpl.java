@@ -107,53 +107,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new APIResponse("Success", "Successfully Deleted", 200, null);
     }
 
-    @Override
-    public APIResponse export() throws IOException {
-        XSSFWorkbook xssfWorkbook = new XSSFWorkbook();
-        XSSFSheet xssfSheet = xssfWorkbook.createSheet("Employee Data");
-
-        XSSFRow xssfRow = xssfSheet.createRow(0);
-        xssfRow.createCell(0).setCellValue("id");
-        xssfRow.createCell(1).setCellValue("emp_name");
-        xssfRow.createCell(2).setCellValue("project_name");
-        xssfRow.createCell(3).setCellValue("salary");
-        xssfRow.createCell(4).setCellValue("date");
-
-        List<Employee> all = employeeRepository.findAll();
-        System.out.println(all.size());
-
-        AtomicInteger count = new AtomicInteger(1);
-        all.forEach(i ->
-                {
-                    XSSFRow row = xssfSheet.createRow(count.getAndIncrement());
-                    row.createCell(0).setCellValue(i.getId());
-                    row.createCell(1).setCellValue(i.getEmpName());
-                    row.createCell(2).setCellValue(i.getProjectName());
-                    row.createCell(3).setCellValue(i.getSalary());
-                    row.createCell(4).setCellValue(i.getDate());
-
-                }
-        );
-
-        FileOutputStream fileOutputStream = new FileOutputStream("null");
-        xssfWorkbook.write(fileOutputStream);
-
-        System.out.println("Done Exporting");
-        return new APIResponse("Success", "Successfully Exported", 200, null);
-    }
 
     @Override
-    public ResponseEntity<ByteArrayResource> downloadTemplate() {
+    public ResponseEntity<ByteArrayResource> downloadData() {
         try {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             XSSFWorkbook workbook = createWorkBook(); // creates the workbook
             HttpHeaders header = new HttpHeaders();
             header.setContentType(new MediaType("application", "force-download"));
-            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ProductTemplate.xlsx");
+            header.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=EmployeeData.xlsx");
             workbook.write(stream);
             workbook.close();
-            return new ResponseEntity<>(new ByteArrayResource(stream.toByteArray()),
-                    header, HttpStatus.CREATED);
+            return new ResponseEntity<>(new ByteArrayResource(stream.toByteArray()), header, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -170,33 +135,29 @@ public class EmployeeServiceImpl implements EmployeeService {
         xssfRow.createCell(3).setCellValue("salary");
 
         List<Employee> all = employeeRepository.findAll();
-        System.out.println(all.size());
 
         AtomicInteger count = new AtomicInteger(1);
-        all.forEach(i ->
-                {
-                    XSSFRow row = xssfSheet.createRow(count.getAndIncrement());
-                    row.createCell(0).setCellValue(i.getId());
-                    row.createCell(1).setCellValue(i.getEmpName());
-                    row.createCell(2).setCellValue(i.getProjectName());
-                    row.createCell(3).setCellValue(i.getSalary());
+        all.forEach(i -> {
+            XSSFRow row = xssfSheet.createRow(count.getAndIncrement());
+            row.createCell(0).setCellValue(i.getId());
+            row.createCell(1).setCellValue(i.getEmpName());
+            row.createCell(2).setCellValue(i.getProjectName());
+            row.createCell(3).setCellValue(i.getSalary());
+        });
 
-                }
-        );
-
-        FileOutputStream fileOutputStream = new FileOutputStream(".//exporteddata//empNewDATA.xlsx");
+        FileOutputStream fileOutputStream = new FileOutputStream(".//datafiles//EmployeeData.xlsx");
         xssfWorkbook.write(fileOutputStream);
 
-        System.out.println("Done Exporting");
         return xssfWorkbook;
 
     }
+
 
     @Override
     public List<Employee> getAllBetweenDates(LocalDate startDate, LocalDate endDate) {
 
         List<Employee> employee = employeeRepository.findByDateBetween(startDate, endDate);
+
         return employee;
     }
 }
-
